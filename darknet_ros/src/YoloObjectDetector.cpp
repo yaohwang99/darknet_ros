@@ -163,6 +163,7 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg) {
 
   try {
     if (msg->encoding == "mono8" || msg->encoding == "bgr8" || msg->encoding == "rgb8") {
+    	printf("%s",msg->encoding);
       cam_image = cv_bridge::toCvCopy(msg, msg->encoding);
     } else if ( msg->encoding == "bgra8") {
       cam_image = cv_bridge::toCvCopy(msg, "bgr8");
@@ -382,6 +383,7 @@ void* YoloObjectDetector::fetchInThread() {
     CvMatWithHeader_ imageAndHeader = getCvMatWithHeader();
     free_image(buff_[buffIndex_]);
     buff_[buffIndex_] = mat_to_image(imageAndHeader.image);
+    rgbgr_image(buff_[buffIndex_]);
     headerBuff_[buffIndex_] = imageAndHeader.header;
     buffId_[buffIndex_] = actionId_;
   }
@@ -470,6 +472,7 @@ void YoloObjectDetector::yolo() {
     boost::shared_lock<boost::shared_mutex> lock(mutexImageCallback_);
     CvMatWithHeader_ imageAndHeader = getCvMatWithHeader();
     buff_[0] = mat_to_image(imageAndHeader.image);
+    rgbgr_image(buff_[0]);
     headerBuff_[0] = imageAndHeader.header;
   }
   buff_[1] = copy_image(buff_[0]);
