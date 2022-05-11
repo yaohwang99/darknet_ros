@@ -154,8 +154,16 @@ void YoloObjectDetector::init() {
   checkForObjectsActionServer_->registerGoalCallback(boost::bind(&YoloObjectDetector::checkForObjectsActionGoalCB, this));
   checkForObjectsActionServer_->registerPreemptCallback(boost::bind(&YoloObjectDetector::checkForObjectsActionPreemptCB, this));
   checkForObjectsActionServer_->start();
-}
 
+  service = nodeHandle_.advertiseService("is_on", &YoloObjectDetector::switchOnOff, this);
+}
+bool YoloObjectDetector::switchOnOff(darknet_ros_msgs::IsOn::Request  &req,
+         darknet_ros_msgs::IsOn::Response &res)
+{
+  res.status = isOn = !isOn;
+  ROS_INFO("sending back response: [%ld]", (long int)res.status);
+  return true;
+}
 void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg) {
   ROS_DEBUG("[YoloObjectDetector] USB image received.");
 
@@ -494,6 +502,13 @@ void YoloObjectDetector::yolo() {
   demoTime_ = what_time_is_it_now();
 
   while (!demoDone_) {
+    if (!isOn)
+      {
+        printf("yolo is closed.\n");
+        std::this_thread::sleep_for(wait_duration);
+        continue;
+      }
+      
     buffIndex_ = (buffIndex_ + 1) % 3;
     fetch_thread = std::thread(&YoloObjectDetector::fetchInThread, this);
     detect_thread = std::thread(&YoloObjectDetector::detectInThread, this);

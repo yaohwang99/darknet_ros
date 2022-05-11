@@ -24,7 +24,10 @@ add_action_files(
   FILES
     CheckForObjects.action
 )
-
+add_service_files(
+  FILES
+    IsOn.srv
+)
 generate_messages(
   DEPENDENCIES
     actionlib_msgs

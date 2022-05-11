@@ -38,6 +38,7 @@
 #include <darknet_ros_msgs/CheckForObjectsAction.h>
 #include <darknet_ros_msgs/ObjectCount.h>
 
+#include <darknet_ros_msgs/IsOn.h>
 // Darknet.
 #ifdef GPU
 #include "cublas_v2.h"
@@ -89,6 +90,8 @@ class YoloObjectDetector {
   ~YoloObjectDetector();
 
  private:
+  bool switchOnOff(darknet_ros_msgs::IsOn::Request  &req,
+         darknet_ros_msgs::IsOn::Response &res);
   /*!
    * Reads and verifies the ROS parameters.
    * @return true if successful.
@@ -211,6 +214,8 @@ class YoloObjectDetector {
 
   int actionId_;
   boost::shared_mutex mutexActionStatus_;
+  bool isOn = false;
+  ros::ServiceServer service;
 
   // double getWallTime();
 
